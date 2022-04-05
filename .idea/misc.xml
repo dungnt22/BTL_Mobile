@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_menu_account.xml" value="0.2505" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_menu_album.xml" value="0.2505" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_menu_all_song.xml" value="0.2505" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_menu_favorite.xml" value="0.2505" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_menu_playing.xml" value="0.2505" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_menu_settings.xml" value="0.2505" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_next.xml" value="0.2505" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_all_song.xml" value="0.25" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_is_playing.xml" value="0.25" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/layout_header_nav.xml" value="0.20606884057971014" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/main.xml" value="0.25" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/menu/menu_items.xml" value="0.25" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

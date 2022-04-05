@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_playing"
+            android:title="@string/menu_isPlaying"
+            android:icon="@drawable/ic_menu_playing" />
+        <item
+            android:id="@+id/menu_allSong"
+            android:title="@string/menu_allSong"
+            android:icon="@drawable/ic_menu_all_song" />
+        <item
+            android:id="@+id/menu_favorite"
+            android:title="@string/menu_favorite"
+            android:icon="@drawable/ic_menu_favorite" />
+        <item
+            android:id="@+id/menu_album"
+            android:title="@string/menu_album"
+            android:icon="@drawable/ic_menu_album" />
+        <item
+            android:id="@+id/menu_artist"
+            android:title="@string/menu_artist"
+            android:icon="@drawable/ic_menu_artist" />
+        <item
+            android:id="@+id/menu_setting"
+            android:title="@string/menu_setting"
+            android:icon="@drawable/ic_menu_settings" />
+    </group>
+</menu>

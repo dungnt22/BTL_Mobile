@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Music Application</string>
+    <string name="titleSong">Title Song</string>
+    <string name="menu_isPlaying">Đang phát</string>
+    <string name="menu_allSong">Tất cả</string>
+    <string name="menu_album">Album</string>
+    <string name="menu_artist">Nghệ sĩ</string>
+    <string name="menu_favorite">Yêu thích</string>
+    <string name="menu_setting">Cài đặt</string>
+
+    <string name="nav_drawer_open">Open Navigation Drawer</string>
+    <string name="nav_drawer_close">Close Navigation Drawer</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

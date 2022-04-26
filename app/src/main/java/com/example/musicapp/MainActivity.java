@@ -4,67 +4,106 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.example.musicapp.fragments.AlbumFragment;
+import com.example.musicapp.fragments.ArtistFragment;
+import com.example.musicapp.fragments.FavouriteFragment;
+import com.example.musicapp.fragments.SettingsFragment;
 import com.example.musicapp.fragments.allSongFragment;
 import com.example.musicapp.fragments.isPlayingFragment;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.musicapp.models.Song;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private static final int REQUEST_CODE = 1;
+
     private static final int FRAGMENT_IS_PLAYING = 0;
     private static final int FRAGMENT_ALL_SONG = 1;
     private static final int FRAGMENT_FAVOURITE = 2;
+    private static final int FRAGMENT_ALBUM = 3;
+    private static final int FRAGMENT_ARTIST = 4;
+    private static final int FRAGMENT_SETTINGS = 5;
 
     private int currentFragment = 0;
+    private int indexOfNowPlaying = 0;
 
     private DrawerLayout drawerLayout;
+
+    public static ArrayList<Song> allOfSong = new ArrayList<>();
+
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        permission();
 
-        // add toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawerLayout);
-        // add toggle to drawerLayout
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.nav_drawer_open, R.string.nav_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        //declare navigationView and capture select item event
-        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // mặc định mở fragment isPlaying đầu tiên
-        changeFragment(new isPlayingFragment());
-        navigationView.getMenu().findItem(R.id.menu_playing).setChecked(true);
+        goToIsPlayingFragment(allOfSong.get(indexOfNowPlaying));
     }
 
-    // xử lý sự kiện chọn item trong menu
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.menu_playing) {
             if (currentFragment != FRAGMENT_IS_PLAYING) {
-                changeFragment(new isPlayingFragment());
-                currentFragment = FRAGMENT_IS_PLAYING;
+                goToIsPlayingFragment(allOfSong.get(indexOfNowPlaying));
             }
         } else if (id == R.id.menu_allSong) {
             if (currentFragment != FRAGMENT_ALL_SONG) {
                 changeFragment(new allSongFragment());
                 currentFragment = FRAGMENT_ALL_SONG;
+            }
+        } else if (id == R.id.menu_favorite) {
+            if (currentFragment != FRAGMENT_FAVOURITE) {
+                changeFragment(new FavouriteFragment());
+                currentFragment = FRAGMENT_FAVOURITE;
+            }
+        } else if (id == R.id.menu_album) {
+            if (currentFragment != FRAGMENT_ALBUM) {
+                changeFragment(new AlbumFragment());
+                currentFragment = FRAGMENT_ALBUM;
+            }
+        } else if (id == R.id.menu_artist) {
+            if (currentFragment != FRAGMENT_ARTIST) {
+                changeFragment(new ArtistFragment());
+                currentFragment = FRAGMENT_ARTIST;
+            }
+        } else if (id == R.id.menu_setting) {
+            if (currentFragment != FRAGMENT_SETTINGS) {
+                changeFragment(new SettingsFragment());
+                currentFragment = FRAGMENT_SETTINGS;
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -72,14 +111,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    // chuyển fragment
     private void changeFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.addToBackStack(fragment.getClass().getName());
         fragmentTransaction.replace(R.id.content_frame, fragment);
         fragmentTransaction.commit();
     }
 
-    // ấn Back trên thiết bị -> đóng menu nếu menu đang mở
+    public void goToIsPlayingFragment(Song song) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        indexOfNowPlaying = allOfSong.indexOf(song);
+
+        isPlayingFragment isPlayingFragment = new isPlayingFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("song_item", song);
+
+        isPlayingFragment.setArguments(bundle);
+
+        currentFragment = FRAGMENT_IS_PLAYING;
+        navigationView.getMenu().findItem(R.id.menu_playing).setChecked(true);
+
+
+        fragmentTransaction.addToBackStack(isPlayingFragment.getClass().getName());
+        fragmentTransaction.replace(R.id.content_frame, isPlayingFragment);
+        fragmentTransaction.commit();
+    }
+
+
+    /**
+     * Click Back on device => close nav if it is opening
+     */
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -87,5 +149,57 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
+    }
+
+    /**
+     * request permissions to write external storage
+     */
+    private void permission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+        } else {
+            allOfSong = getAllSong(this);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,@NonNull String[] permissions,@NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
+                allOfSong = getAllSong(this);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+            }
+        }
+    }
+
+    public static ArrayList<Song> getAllSong(Context context) {
+        ArrayList<Song> output = new ArrayList<>();
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String[] projection = {
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.ARTIST
+        };
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String album = cursor.getString(0);
+                String title = cursor.getString(1);
+                String duration = cursor.getString(2);
+                String data = cursor.getString(3);
+                String artist = cursor.getString(4);
+
+                Song song = new Song(album, title, duration, data, artist);
+                Log.e("Path", "Path: " + data + " Album: " + album);
+                output.add(song);
+            }
+            cursor.close();
+        }
+        return output;
     }
 }

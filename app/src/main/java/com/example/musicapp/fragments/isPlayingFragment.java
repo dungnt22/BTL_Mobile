@@ -1,6 +1,9 @@
 package com.example.musicapp.fragments;
 
-import static com.example.musicapp.MainActivity.allOfSong;
+import static com.example.musicapp.Base.favoritePlaylist;
+import static com.example.musicapp.Base.mediaPlayer;
+import static com.example.musicapp.Base.nowPlaying;
+import static com.example.musicapp.Base.nowPosition;
 
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
@@ -23,7 +26,9 @@ import com.example.musicapp.R;
 import com.example.musicapp.models.Song;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class isPlayingFragment extends Fragment {
+import java.util.Random;
+
+public class isPlayingFragment extends Fragment implements MediaPlayer.OnCompletionListener {
 
     private TextView titleSong;
     private TextView artist;
@@ -34,13 +39,14 @@ public class isPlayingFragment extends Fragment {
     private ImageView preButton;
     private ImageView repeatButton;
     private ImageView shuffleButton;
+    private ImageView favButton;
     private SeekBar seekBar;
     private FloatingActionButton playPauseButton;
 
-    private MediaPlayer mediaPlayer;
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private Song song;
-    private int nowPosition = -1;
+    private boolean repeat = false;
+    private boolean shuffle = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,6 +55,8 @@ public class isPlayingFragment extends Fragment {
         init(view);
         getSongFromBundle();
         setView();
+
+        mediaPlayer.setOnCompletionListener(this);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -84,13 +92,7 @@ public class isPlayingFragment extends Fragment {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mediaPlayer.isPlaying()) {
-                    playPauseButton.setImageResource(R.drawable.ic_play_2);
-                    mediaPlayer.pause();
-                } else {
-                    playPauseButton.setImageResource(R.drawable.ic_pause);
-                    mediaPlayer.start();
-                }
+                doPlayOrPause();
             }
         });
 
@@ -105,6 +107,27 @@ public class isPlayingFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 doPre();
+            }
+        });
+
+        repeatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doRepeat();
+            }
+        });
+
+        shuffleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doShuffle();
+            }
+        });
+
+        favButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doFavourite();
             }
         });
 
@@ -123,13 +146,14 @@ public class isPlayingFragment extends Fragment {
         preButton = view.findViewById(R.id.button_pre);
         repeatButton = view.findViewById(R.id.button_repeat);
         shuffleButton = view.findViewById(R.id.button_shuffle);
+        favButton = view.findViewById(R.id.button_favorite);
     }
 
     private void getSongFromBundle() {
         Bundle bundleReceive = getArguments();
         if (bundleReceive != null) {
             song = (Song) bundleReceive.get("song_item");
-            nowPosition = allOfSong.indexOf(song);
+            nowPosition = nowPlaying.indexOf(song);
         }
     }
 
@@ -138,6 +162,11 @@ public class isPlayingFragment extends Fragment {
         titleSong.setText(song.getTitle());
         artist.setText(song.getArtist());
         timeTotal.setText(convertTime(Integer.parseInt(song.getDuration()) / 1000));
+        if (song.isFavorite()) {
+            favButton.setImageResource(R.drawable.ic_favorite_full);
+        } else {
+            favButton.setImageResource(R.drawable.ic_favorite);
+        }
 
         byte[] image = getImage(song.getPath());
         if (image != null) {
@@ -154,7 +183,6 @@ public class isPlayingFragment extends Fragment {
             }
         }
         playLocalMedia();
-
     }
 
     private byte[] getImage(String uri) {
@@ -175,6 +203,7 @@ public class isPlayingFragment extends Fragment {
         mediaPlayer.start();
         seekBar.setMax(mediaPlayer.getDuration() / 1000);
         playPauseButton.setImageResource(R.drawable.ic_pause);
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     private String convertTime(int milliseconds) {
@@ -187,10 +216,28 @@ public class isPlayingFragment extends Fragment {
         }
     }
 
+    private void doPlayOrPause() {
+        if (mediaPlayer.isPlaying()) {
+            playPauseButton.setImageResource(R.drawable.ic_play_2);
+            mediaPlayer.pause();
+        } else {
+            playPauseButton.setImageResource(R.drawable.ic_pause);
+            mediaPlayer.start();
+        }
+    }
+
     private void doNext() {
-        if (nowPosition < allOfSong.size()) {
+        if (shuffle) {
+            nowPosition = getRandomIndex(nowPlaying.size() - 1);
+            song = nowPlaying.get(nowPosition);
+            setView();
+        } else if (repeat) {
+            nowPosition = ((nowPosition + 1) % nowPlaying.size());
+            song = nowPlaying.get(nowPosition);
+            setView();
+        } else if (nowPosition < (nowPlaying.size() - 1)) {
             nowPosition = nowPosition + 1;
-            song = allOfSong.get(nowPosition);
+            song = nowPlaying.get(nowPosition);
             setView();
         } else {
             Toast.makeText(this.getContext(), "Bạn đang ở cuối danh sách nhạc!", Toast.LENGTH_SHORT).show();
@@ -198,20 +245,60 @@ public class isPlayingFragment extends Fragment {
     }
 
     private void doPre() {
-        if (nowPosition > 0) {
-            nowPosition = nowPosition - 1;
-            song = allOfSong.get(nowPosition);
+        if (shuffle) {
+            nowPosition = getRandomIndex(nowPlaying.size() - 1);
+            song = nowPlaying.get(nowPosition);
             setView();
-        } else {
-            Toast.makeText(this.getContext(), "Bạn đang ở đầu danh sách nhạc!", Toast.LENGTH_SHORT).show();
+        } else if (nowPosition > 0) {
+            nowPosition = nowPosition - 1;
+            song = nowPlaying.get(nowPosition);
+            setView();
+        } else if (nowPosition == 0){
+            nowPosition = nowPlaying.size() - 1;
+            song = nowPlaying.get(nowPosition);
+            setView();
         }
     }
 
     private void doRepeat() {
-
+        if (repeat) {
+            repeat = false;
+            repeatButton.setImageResource(R.drawable.ic_repeat_off);
+        } else {
+            repeat = true;
+            repeatButton.setImageResource(R.drawable.ic_repeat_on);
+        }
     }
 
     private void doShuffle() {
+        if (shuffle) {
+            shuffle = false;
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_off);
+        } else {
+            shuffle = true;
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_on);
+        }
+    }
 
+    private void doFavourite() {
+        if (song.isFavorite()) {
+            song.setFavorite(false);
+            favButton.setImageResource(R.drawable.ic_favorite);
+            favoritePlaylist.remove(song);
+        } else {
+            song.setFavorite(true);
+            favButton.setImageResource(R.drawable.ic_favorite_full);
+            favoritePlaylist.add(song);
+        }
+    }
+
+    private int getRandomIndex(int i) {
+        Random random = new Random();
+        return random.nextInt(i + 1);
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+        doNext();
     }
 }

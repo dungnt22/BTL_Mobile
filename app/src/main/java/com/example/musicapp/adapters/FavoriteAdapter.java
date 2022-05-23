@@ -1,85 +1,81 @@
-package com.example.musicapp;
+package com.example.musicapp.adapters;
 
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.musicapp.R;
 import com.example.musicapp.models.Song;
 
 import java.util.ArrayList;
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
+public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavViewHolder> {
     private Context context;
-    private ArrayList<Song> songs;
-    private IClickSongItem iClickSongItem;
+    private ArrayList<Song> favList;
+    private IFavItemClick iFavItemClick;
 
-    public interface IClickSongItem {
-        void onClickSongItem(Song song);
+    public interface IFavItemClick {
+        void onFavItemClick(Song song);
     }
 
-    public SongAdapter(Context context, ArrayList<Song> songs, IClickSongItem iClickSongItem) {
+    public FavoriteAdapter(Context context, ArrayList<Song> favList, IFavItemClick iFavItemClick) {
         this.context = context;
-        this.songs = songs;
-        this.iClickSongItem = iClickSongItem;
+        this.favList = favList;
+        this.iFavItemClick = iFavItemClick;
     }
 
     @NonNull
     @Override
-    public SongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FavViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.song_item, parent, false);
-        return new SongViewHolder(view);
+        return new FavViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
-        Song song = songs.get(position);
-        if (song == null) {
-            return;
-        }
+    public void onBindViewHolder(@NonNull FavViewHolder holder, int position) {
+        Song song = favList.get(position);
 
         holder.title.setText(song.getTitle());
         byte[] image = getImage(song.getPath());
         if (image != null) {
             Glide.with(context).asBitmap()
                     .load(image)
-                    .into(holder.album);
+                    .into(holder.image);
         } else {
             Glide.with(context)
                     .load(R.drawable.ic_music_record)
-                    .into(holder.album);
+                    .into(holder.image);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                iClickSongItem.onClickSongItem(song);
+                iFavItemClick.onFavItemClick(song);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return songs.size();
+        return favList.size();
     }
 
-    public class SongViewHolder extends RecyclerView.ViewHolder {
+    public class FavViewHolder extends RecyclerView.ViewHolder {
         private TextView title;
-        private ImageView album;
+        private ImageView image;
 
-        public SongViewHolder(@NonNull View itemView) {
+        public FavViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.song_item_title);
-            album = itemView.findViewById(R.id.song_item_img);
+            image = itemView.findViewById(R.id.song_item_img);
         }
     }
 

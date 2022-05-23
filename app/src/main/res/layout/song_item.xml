@@ -2,7 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/song_item">
+    android:id="@+id/song_item"
+    android:background="@color/song_item_color"
+    android:layout_marginBottom="1dp">
 
     <ImageView
         android:layout_width="60dp"

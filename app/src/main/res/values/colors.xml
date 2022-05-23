@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="background_color">#FF7083F1</color>
+    <color name="song_item_color">#2A41C3</color>
 </resources>

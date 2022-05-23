@@ -42,14 +42,16 @@
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_below="@+id/playing_header">
+
         <ImageView
+            android:id="@+id/img_cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/img_cover"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:src="@drawable/anh"/>
+            android:src="@drawable/anh" />
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/playing_seeking"
         android:layout_width="match_parent"
@@ -64,21 +66,23 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="18dp"
             android:layout_marginBottom="10dp" />
+
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/time_played"
-            android:text="0:00"
-            android:layout_below="@id/seeking"
-            android:layout_marginStart="20dp"/>
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/seeking"
+            android:layout_marginStart="20dp"
+            android:text="0:00" />
+
+        <TextView
             android:id="@+id/time_total"
-            android:text="4:28"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@id/seeking"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="20dp"/>
+            android:layout_marginEnd="20dp"
+            android:text="4:28" />
 
     </RelativeLayout>
     <RelativeLayout
@@ -116,14 +120,14 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:id="@+id/button_shuffle"
-            android:src="@drawable/ic_shuffle"
+            android:src="@drawable/ic_shuffle_off"
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"/>
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:id="@+id/button_repeat"
-            android:src="@drawable/ic_repeat"
+            android:src="@drawable/ic_repeat_off"
             android:layout_centerVertical="true"
             android:layout_marginEnd="20dp"
             android:layout_alignParentEnd="true"/>

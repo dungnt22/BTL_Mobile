@@ -1,8 +1,14 @@
 package com.example.musicapp;
 
+import static com.example.musicapp.Base.albums;
+import static com.example.musicapp.Base.artists;
+import static com.example.musicapp.Base.nowPlaying;
+import static com.example.musicapp.Base.nowPosition;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -19,6 +25,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -33,7 +40,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
     private static final int REQUEST_CODE = 1;
 
     private static final int FRAGMENT_IS_PLAYING = 0;
@@ -43,14 +50,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int FRAGMENT_ARTIST = 4;
     private static final int FRAGMENT_SETTINGS = 5;
 
-    private int currentFragment = 0;
-    private int indexOfNowPlaying = 0;
+    public static int currentFragment = 0;
 
     private DrawerLayout drawerLayout;
 
     public static ArrayList<Song> allOfSong = new ArrayList<>();
 
-    NavigationView navigationView;
+    public static NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        goToIsPlayingFragment(allOfSong.get(indexOfNowPlaying));
+        goToIsPlayingFragment(nowPlaying.get(nowPosition));
     }
 
     @Override
@@ -78,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         if (id == R.id.menu_playing) {
             if (currentFragment != FRAGMENT_IS_PLAYING) {
-                goToIsPlayingFragment(allOfSong.get(indexOfNowPlaying));
+                goToIsPlayingFragment(nowPlaying.get(nowPosition));
             }
         } else if (id == R.id.menu_allSong) {
             if (currentFragment != FRAGMENT_ALL_SONG) {
@@ -120,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void goToIsPlayingFragment(Song song) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        indexOfNowPlaying = allOfSong.indexOf(song);
+        nowPosition = nowPlaying.indexOf(song);
 
         isPlayingFragment isPlayingFragment = new isPlayingFragment();
 
@@ -159,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
         } else {
             allOfSong = getAllSong(this);
+            nowPlaying = allOfSong;
         }
     }
 
@@ -169,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
                 allOfSong = getAllSong(this);
+                nowPlaying = allOfSong;
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
             }
@@ -177,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static ArrayList<Song> getAllSong(Context context) {
         ArrayList<Song> output = new ArrayList<>();
+        ArrayList<String> duplicateAlbum = new ArrayList<>();
+        ArrayList<String> duplicateArtist = new ArrayList<>();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String[] projection = {
                 MediaStore.Audio.Media.ALBUM,
@@ -197,9 +207,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Song song = new Song(album, title, duration, data, artist);
                 Log.e("Path", "Path: " + data + " Album: " + album);
                 output.add(song);
+                if (!duplicateAlbum.contains(album)) {
+                    albums.add(song);
+                    duplicateAlbum.add(album);
+                }
+                if (!duplicateArtist.contains(artist)) {
+                    artists.add(song);
+                    duplicateArtist.add(artist);
+                }
             }
             cursor.close();
         }
         return output;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search, menu);
+        MenuItem menuItem = menu.findItem(R.id.menu_search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        String userInput = newText.toLowerCase();
+        ArrayList<Song> searchSong = new ArrayList<>();
+        for (Song song : allOfSong) {
+            if (song.getTitle().toLowerCase().contains(userInput)) {
+                searchSong.add(song);
+            }
+        }
+        allSongFragment.songAdapter.updateList(searchSong);
+        return true;
     }
 }

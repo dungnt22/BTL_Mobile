@@ -1,18 +1,34 @@
 package com.example.musicapp.fragments;
 
+import static android.content.Context.BIND_AUTO_CREATE;
+import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.example.musicapp.ApplicationClass.ACTION_NEXT;
+import static com.example.musicapp.ApplicationClass.ACTION_PLAY_PAUSE;
+import static com.example.musicapp.ApplicationClass.ACTION_PREVIOUS;
+import static com.example.musicapp.ApplicationClass.CHANNEL_ID_2;
 import static com.example.musicapp.Base.favoritePlaylist;
-import static com.example.musicapp.Base.mediaPlayer;
 import static com.example.musicapp.Base.nowPlaying;
 import static com.example.musicapp.Base.nowPosition;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.os.IBinder;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +38,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.musicapp.ActionPlaying;
+import com.example.musicapp.NotificationReceiver;
 import com.example.musicapp.R;
 import com.example.musicapp.models.Song;
+import com.example.musicapp.services.MusicService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Random;
 
-public class isPlayingFragment extends Fragment implements MediaPlayer.OnCompletionListener {
+public class isPlayingFragment extends Fragment implements ActionPlaying, ServiceConnection, MediaPlayer.OnCompletionListener {
 
     private TextView titleSong;
     private TextView artist;
@@ -48,6 +67,8 @@ public class isPlayingFragment extends Fragment implements MediaPlayer.OnComplet
     private boolean repeat = false;
     private boolean shuffle = false;
 
+    MusicService musicService;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,13 +77,11 @@ public class isPlayingFragment extends Fragment implements MediaPlayer.OnComplet
         getSongFromBundle();
         setView();
 
-        mediaPlayer.setOnCompletionListener(this);
-
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (mediaPlayer != null && fromUser) {
-                    mediaPlayer.seekTo(progress * 1000);
+                if (musicService != null && fromUser) {
+                    musicService.seekTo(progress * 1000);
                 }
             }
 
@@ -80,8 +99,8 @@ public class isPlayingFragment extends Fragment implements MediaPlayer.OnComplet
         this.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mediaPlayer != null) {
-                    int currentPosition = mediaPlayer.getCurrentPosition() / 1000;
+                if (musicService != null) {
+                    int currentPosition = musicService.getCurrentPosition() / 1000;
                     seekBar.setProgress(currentPosition);
                     timePlayed.setText(convertTime(currentPosition));
                 }
@@ -168,6 +187,18 @@ public class isPlayingFragment extends Fragment implements MediaPlayer.OnComplet
             favButton.setImageResource(R.drawable.ic_favorite);
         }
 
+        if (shuffle) {
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_on);
+        } else {
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_off);
+        }
+
+        if (repeat) {
+            repeatButton.setImageResource(R.drawable.ic_repeat_on);
+        } else {
+            repeatButton.setImageResource(R.drawable.ic_repeat_off);
+        }
+
         byte[] image = getImage(song.getPath());
         if (image != null) {
             if (this.getContext() != null) {
@@ -194,16 +225,13 @@ public class isPlayingFragment extends Fragment implements MediaPlayer.OnComplet
     }
 
     private void playLocalMedia() {
-        Uri uri = Uri.parse(song.getPath());
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        }
-        mediaPlayer = MediaPlayer.create(this.getContext(), uri);
-        mediaPlayer.start();
-        seekBar.setMax(mediaPlayer.getDuration() / 1000);
+        Intent intent = new Intent(this.getContext(), MusicService.class);
+        intent.putExtra("index", nowPosition);
+        getActivity().startService(intent);
         playPauseButton.setImageResource(R.drawable.ic_pause);
-        mediaPlayer.setOnCompletionListener(this);
+        if (musicService != null) {
+            musicService.showNotification(R.drawable.ic_pause);
+        }
     }
 
     private String convertTime(int milliseconds) {
@@ -216,17 +244,32 @@ public class isPlayingFragment extends Fragment implements MediaPlayer.OnComplet
         }
     }
 
-    private void doPlayOrPause() {
-        if (mediaPlayer.isPlaying()) {
+    @Override
+    public void onResume() {
+        Intent intent = new Intent(this.getActivity(), MusicService.class);
+        getActivity().bindService(intent, this, BIND_AUTO_CREATE);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        getActivity().unbindService(this);
+        super.onPause();
+    }
+
+    public void doPlayOrPause() {
+        if (musicService.isPlaying()) {
+            musicService.showNotification(R.drawable.ic_play_2);
             playPauseButton.setImageResource(R.drawable.ic_play_2);
-            mediaPlayer.pause();
+            musicService.pause();
         } else {
+            musicService.showNotification(R.drawable.ic_pause);
             playPauseButton.setImageResource(R.drawable.ic_pause);
-            mediaPlayer.start();
+            musicService.start();
         }
     }
 
-    private void doNext() {
+    public void doNext() {
         if (shuffle) {
             nowPosition = getRandomIndex(nowPlaying.size() - 1);
             song = nowPlaying.get(nowPosition);
@@ -244,7 +287,7 @@ public class isPlayingFragment extends Fragment implements MediaPlayer.OnComplet
         }
     }
 
-    private void doPre() {
+    public void doPre() {
         if (shuffle) {
             nowPosition = getRandomIndex(nowPlaying.size() - 1);
             song = nowPlaying.get(nowPosition);
@@ -295,6 +338,22 @@ public class isPlayingFragment extends Fragment implements MediaPlayer.OnComplet
     private int getRandomIndex(int i) {
         Random random = new Random();
         return random.nextInt(i + 1);
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        MusicService.MyBinder myBinder = (MusicService.MyBinder) iBinder;
+        musicService = myBinder.getService();
+        musicService.setCallBack(this);
+
+        seekBar.setMax(musicService.getDuration() / 1000);
+        musicService.getMediaPlayer().setOnCompletionListener(this);
+        musicService.showNotification(R.drawable.ic_pause);
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName componentName) {
+        musicService = null;
     }
 
     @Override

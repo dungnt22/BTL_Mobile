@@ -76,7 +76,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        goToIsPlayingFragment(nowPlaying.get(nowPosition));
+//        goToIsPlayingFragment(nowPlaying.get(nowPosition));
+        changeFragment(new allSongFragment());
+        navigationView.getMenu().findItem(R.id.menu_allSong).setChecked(true);
+        currentFragment = FRAGMENT_ALL_SONG;
     }
 
     @Override
@@ -205,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String artist = cursor.getString(4);
 
                 Song song = new Song(album, title, duration, data, artist);
-                Log.e("Path", "Path: " + data + " Album: " + album);
                 output.add(song);
                 if (!duplicateAlbum.contains(album)) {
                     albums.add(song);

@@ -1,6 +1,9 @@
 package com.example.musicapp.fragments;
 
 import static android.content.Context.BIND_AUTO_CREATE;
+import static com.example.musicapp.ApplicationClass.ACTION_NEXT;
+import static com.example.musicapp.ApplicationClass.ACTION_PLAY_PAUSE;
+import static com.example.musicapp.ApplicationClass.ACTION_PREVIOUS;
 import static com.example.musicapp.Base.favoritePlaylist;
 import static com.example.musicapp.Base.nowPlaying;
 import static com.example.musicapp.Base.nowPosition;
@@ -8,8 +11,11 @@ import static com.example.musicapp.Base.repeat;
 import static com.example.musicapp.Base.shuffle;
 import static com.example.musicapp.MainActivity.appMusic;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
@@ -37,6 +43,24 @@ import java.util.Random;
 
 public class isPlayingFragment extends Fragment implements ActionPlaying, ServiceConnection {
 
+    private Song mSong;
+    private Boolean isPlaying;
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if (bundle == null) {
+                return;
+            }
+
+            mSong = (Song) bundle.get("oj_song");
+            isPlaying = bundle.getBoolean("status_player");
+            String actionMusic = bundle.getString("action_music");
+
+            handleLayoutMusic(actionMusic);
+        }
+    };
+
     private TextView titleSong;
     private TextView artist;
     private ImageView imgAlbum;
@@ -63,6 +87,8 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         init(view);
         getSongFromBundle();
         setView();
+
+        requireActivity().registerReceiver(broadcastReceiver, new IntentFilter("send_data_to_fragment"));
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -353,6 +379,77 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     @Override
     public void onServiceDisconnected(ComponentName componentName) {
         musicService = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        requireActivity().unregisterReceiver(broadcastReceiver);
+        musicService = null;
+    }
+
+    private void handleLayoutMusic(String actionMusic) {
+        switch (actionMusic) {
+            case ACTION_PLAY_PAUSE:
+                setStatusPlayOrPause();
+                break;
+
+            case ACTION_NEXT:
+
+            case ACTION_PREVIOUS:
+                showInfoSong();
+                break;
+        }
+    }
+
+    private void showInfoSong() {
+        if (mSong == null) {
+            return;
+        }
+
+        titleSong.setText(mSong.getTitle());
+        artist.setText(mSong.getArtist());
+        timeTotal.setText(convertTime(Integer.parseInt(mSong.getDuration()) / 1000));
+        if (favoritePlaylist.contains(mSong)) {
+            favButton.setImageResource(R.drawable.ic_favorite_full);
+        } else {
+            favButton.setImageResource(R.drawable.ic_favorite);
+        }
+
+        if (shuffle) {
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_on);
+        } else {
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_off);
+        }
+
+        if (repeat) {
+            repeatButton.setImageResource(R.drawable.ic_repeat_on);
+        } else {
+            repeatButton.setImageResource(R.drawable.ic_repeat_off);
+        }
+
+        byte[] image = getImage(mSong.getPath());
+        if (image != null) {
+            if (this.getContext() != null) {
+                Glide.with(this.getContext()).asBitmap()
+                        .load(image)
+                        .into(imgAlbum);
+            }
+        } else {
+            if (this.getContext() != null) {
+                Glide.with(this.getContext())
+                        .load(R.drawable.ic_music_record)
+                        .into(imgAlbum);
+            }
+        }
+    }
+
+    private void setStatusPlayOrPause() {
+        if (isPlaying) {
+            playPauseButton.setImageResource(R.drawable.ic_pause);
+        } else {
+            playPauseButton.setImageResource(R.drawable.ic_play_2);
+        }
     }
 }
 

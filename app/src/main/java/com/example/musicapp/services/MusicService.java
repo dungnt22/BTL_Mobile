@@ -34,18 +34,15 @@ import com.example.musicapp.models.Song;
 
 import java.util.ArrayList;
 
-public class MusicService extends Service {
+public class MusicService extends Service implements MediaPlayer.OnCompletionListener {
     IBinder myBinder = new MyBinder();
     private MediaPlayer mediaPlayer;
     ActionPlaying actionPlaying;
     private int position;
-    Song song;
-    ArrayList<Song> list = new ArrayList<>();
 
     @Override
     public void onCreate() {
         super.onCreate();
-        list = nowPlaying;
     }
 
     @Nullable
@@ -53,7 +50,6 @@ public class MusicService extends Service {
     public IBinder onBind(Intent intent) {
         return myBinder;
     }
-
 
     public class MyBinder extends Binder {
         public MusicService getService() {
@@ -95,26 +91,18 @@ public class MusicService extends Service {
             mediaPlayer.stop();
             mediaPlayer.release();
         }
-        song = nowPlaying.get(position);
-        Uri uri = Uri.parse(song.getPath());
-        createMusic(uri);
+        createMusic(position);
         mediaPlayer.start();
     }
 
-    public void createMusic(Uri uri) {
+    public void createMusic(int position) {
+        Song song = nowPlaying.get(position);
+        Uri uri = Uri.parse(song.getPath());
         mediaPlayer = MediaPlayer.create(getBaseContext(), uri);
     }
 
     public void start() {
         mediaPlayer.start();
-    }
-
-    public void stop() {
-        mediaPlayer.stop();
-    }
-
-    public void release() {
-        mediaPlayer.release();
     }
 
     public void pause() {
@@ -137,8 +125,15 @@ public class MusicService extends Service {
         return mediaPlayer.isPlaying();
     }
 
-    public MediaPlayer getMediaPlayer() {
-        return mediaPlayer;
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+        if (actionPlaying != null) {
+            actionPlaying.doNext();
+        }
+    }
+
+    public void onCompleted() {
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     public void setCallBack(ActionPlaying actionPlaying) {

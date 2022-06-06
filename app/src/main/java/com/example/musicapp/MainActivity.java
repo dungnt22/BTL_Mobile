@@ -2,6 +2,7 @@ package com.example.musicapp;
 
 import static com.example.musicapp.Base.albums;
 import static com.example.musicapp.Base.artists;
+import static com.example.musicapp.Base.favoritePlaylist;
 import static com.example.musicapp.Base.nowPlaying;
 import static com.example.musicapp.Base.nowPosition;
 
@@ -51,18 +52,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int FRAGMENT_SETTINGS = 5;
 
     public static int currentFragment = 0;
-
     private DrawerLayout drawerLayout;
-
     public static ArrayList<Song> allOfSong = new ArrayList<>();
-
     public static NavigationView navigationView;
+    public static ApplicationClass appMusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permission();
+
+        appMusic = (ApplicationClass) getApplication();
+        appMusic.dbManager.open();
+        favoritePlaylist = appMusic.dbManager.getAll();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -80,6 +83,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         changeFragment(new allSongFragment());
         navigationView.getMenu().findItem(R.id.menu_allSong).setChecked(true);
         currentFragment = FRAGMENT_ALL_SONG;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        appMusic.dbManager.close();
     }
 
     @Override

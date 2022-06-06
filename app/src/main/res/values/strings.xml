@@ -8,6 +8,10 @@
     <string name="menu_favorite">Yêu thích</string>
     <string name="menu_setting">Cài đặt</string>
     <string name="menu_search">Search</string>
+    <string name="playlist">Danh sách phát</string>
+    <string name="themes">Giao diện</string>
+    <string name="theme1">Sáng</string>
+    <string name="theme2">Tối</string>
 
     <string name="nav_drawer_open">Open Navigation Drawer</string>
     <string name="nav_drawer_close">Close Navigation Drawer</string>

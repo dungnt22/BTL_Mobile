@@ -7,41 +7,43 @@ import static com.example.musicapp.MainActivity.navigationView;
 
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-
 import com.bumptech.glide.Glide;
-import com.example.musicapp.adapters.AlbumDetailAdapter;
 import com.example.musicapp.R;
+import com.example.musicapp.adapters.ArtistDetailAdapter;
 import com.example.musicapp.models.Song;
 
 import java.util.ArrayList;
 
-public class AlbumDetail extends Fragment {
-    private ImageView albumImage;
-    private RecyclerView albumList;
-    String albumName;
-    private ArrayList<Song> albumSongs;
-    AlbumDetailAdapter albumDetailAdapter;
+public class ArtistDetail extends Fragment {
+    private ImageView imageView;
+    private RecyclerView artistList;
+    private ArrayList<Song> artistSongs;
+    String artistName;
+    ArtistDetailAdapter artistDetailAdapter;
 
-    public AlbumDetail() {
+    public ArtistDetail() {
 
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_album_detail, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_artist_detail, container, false);
         init(view);
-        getAlbumFromBundle();
+        getArtistFromBundle();
 
         return view;
     }
@@ -49,11 +51,11 @@ public class AlbumDetail extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (!(albumSongs.size() < 1)) {
-            albumDetailAdapter = new AlbumDetailAdapter(this.getContext(), albumSongs, new AlbumDetailAdapter.IClick() {
+        if (!(artistSongs.size() < 1)) {
+            artistDetailAdapter = new ArtistDetailAdapter(this.getContext(), artistSongs, new ArtistDetailAdapter.IClick() {
                 @Override
                 public void onClickItem(Song song) {
-                    nowPlaying = albumSongs;
+                    nowPlaying = artistSongs;
 
                     FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                     isPlayingFragment isPlayingFragment = new isPlayingFragment();
@@ -71,40 +73,40 @@ public class AlbumDetail extends Fragment {
                     fragmentTransaction.commit();
                 }
             });
-            albumList.setAdapter(albumDetailAdapter);
-            albumList.setLayoutManager(new LinearLayoutManager(this.getContext(), RecyclerView.VERTICAL, false));
+            artistList.setAdapter(artistDetailAdapter);
+            artistList.setLayoutManager(new LinearLayoutManager(this.getContext(), RecyclerView.VERTICAL, false));
         }
     }
 
     private void init(View view) {
-        albumImage = view.findViewById(R.id.album_detail_img);
-        albumList = view.findViewById(R.id.album_detail_list);
-        albumSongs = new ArrayList<>();
+        imageView = view.findViewById(R.id.artist_detail_img);
+        artistList = view.findViewById(R.id.artist_detail_list);
+        artistSongs = new ArrayList<>();
     }
 
-    private void getAlbumFromBundle() {
-        Bundle bundleReceive = getArguments();
-        if (bundleReceive != null) {
-            Song album = (Song) bundleReceive.get("album_item");
-            albumName = album.getAlbum();
+    private void getArtistFromBundle() {
+        Bundle bundleReceiver = getArguments();
+        if (bundleReceiver != null) {
+            Song artist = (Song) bundleReceiver.get("artist_item");
+            artistName = artist.getArtist();
             for (int i = 0; i < allOfSong.size(); i++) {
-                if (albumName.equals(allOfSong.get(i).getAlbum())) {
-                    albumSongs.add(allOfSong.get(i));
+                if (artistName.equals(allOfSong.get(i).getArtist())) {
+                    artistSongs.add(allOfSong.get(i));
                 }
             }
 
-            byte[] image = getImage(album.getPath());
+            byte[] image = getImage(artist.getPath());
             if (image != null) {
                 if (this.getContext() != null) {
                     Glide.with(this.getContext()).asBitmap()
                             .load(image)
-                            .into(albumImage);
+                            .into(imageView);
                 }
             } else {
                 if (this.getContext() != null) {
                     Glide.with(this.getContext())
                             .load(R.drawable.ic_music_record)
-                            .into(albumImage);
+                            .into(imageView);
                 }
             }
         }
@@ -117,5 +119,4 @@ public class AlbumDetail extends Fragment {
         retriever.release();
         return image;
     }
-
 }

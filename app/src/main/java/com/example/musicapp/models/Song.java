@@ -8,7 +8,6 @@ public class Song implements Serializable {
     private String artist;
     private String duration;
     private String album;
-    private boolean favorite;
 
     public Song() {
 
@@ -20,7 +19,6 @@ public class Song implements Serializable {
         this.artist = artist;
         this.duration = duration;
         this.album = album;
-        favorite = false;
     }
 
     public String getPath() {
@@ -61,13 +59,5 @@ public class Song implements Serializable {
 
     public void setAlbum(String album) {
         this.album = album;
-    }
-
-    public boolean isFavorite() {
-        return favorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
     }
 }

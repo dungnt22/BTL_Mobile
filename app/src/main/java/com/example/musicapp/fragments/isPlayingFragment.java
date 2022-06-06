@@ -1,34 +1,23 @@
 package com.example.musicapp.fragments;
 
 import static android.content.Context.BIND_AUTO_CREATE;
-import static android.content.Context.NOTIFICATION_SERVICE;
-import static com.example.musicapp.ApplicationClass.ACTION_NEXT;
-import static com.example.musicapp.ApplicationClass.ACTION_PLAY_PAUSE;
-import static com.example.musicapp.ApplicationClass.ACTION_PREVIOUS;
-import static com.example.musicapp.ApplicationClass.CHANNEL_ID_2;
 import static com.example.musicapp.Base.favoritePlaylist;
 import static com.example.musicapp.Base.nowPlaying;
 import static com.example.musicapp.Base.nowPosition;
+import static com.example.musicapp.Base.repeat;
+import static com.example.musicapp.Base.shuffle;
+import static com.example.musicapp.MainActivity.appMusic;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +28,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.ActionPlaying;
-import com.example.musicapp.NotificationReceiver;
 import com.example.musicapp.R;
 import com.example.musicapp.models.Song;
 import com.example.musicapp.services.MusicService;
@@ -47,7 +35,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Random;
 
-public class isPlayingFragment extends Fragment implements ActionPlaying, ServiceConnection, MediaPlayer.OnCompletionListener {
+public class isPlayingFragment extends Fragment implements ActionPlaying, ServiceConnection {
 
     private TextView titleSong;
     private TextView artist;
@@ -60,12 +48,11 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     private ImageView shuffleButton;
     private ImageView favButton;
     private SeekBar seekBar;
+    private TextView playlist;
     private FloatingActionButton playPauseButton;
 
     private final Handler handler = new Handler();
     private Song song;
-    private boolean repeat = false;
-    private boolean shuffle = false;
 
     MusicService musicService;
 
@@ -150,6 +137,13 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
             }
         });
 
+        playlist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPlaylist();
+            }
+        });
+
         return view;
     }
 
@@ -166,6 +160,7 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         repeatButton = view.findViewById(R.id.button_repeat);
         shuffleButton = view.findViewById(R.id.button_shuffle);
         favButton = view.findViewById(R.id.button_favorite);
+        playlist = view.findViewById(R.id.playlist);
     }
 
     private void getSongFromBundle() {
@@ -181,7 +176,7 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         titleSong.setText(song.getTitle());
         artist.setText(song.getArtist());
         timeTotal.setText(convertTime(Integer.parseInt(song.getDuration()) / 1000));
-        if (song.isFavorite()) {
+        if (favoritePlaylist.contains(song)) {
             favButton.setImageResource(R.drawable.ic_favorite_full);
         } else {
             favButton.setImageResource(R.drawable.ic_favorite);
@@ -324,15 +319,19 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     }
 
     private void doFavourite() {
-        if (song.isFavorite()) {
-            song.setFavorite(false);
+        if (favoritePlaylist.contains(song)) {
             favButton.setImageResource(R.drawable.ic_favorite);
             favoritePlaylist.remove(song);
+            appMusic.dbManager.deleteFav(song.getTitle());
         } else {
-            song.setFavorite(true);
             favButton.setImageResource(R.drawable.ic_favorite_full);
             favoritePlaylist.add(song);
+            appMusic.dbManager.add(song);
         }
+    }
+
+    private void showPlaylist() {
+        Toast.makeText(this.getActivity(), "Playlist", Toast.LENGTH_SHORT).show();
     }
 
     private int getRandomIndex(int i) {
@@ -347,7 +346,7 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         musicService.setCallBack(this);
 
         seekBar.setMax(musicService.getDuration() / 1000);
-        musicService.getMediaPlayer().setOnCompletionListener(this);
+        musicService.onCompleted();
         musicService.showNotification(R.drawable.ic_pause);
     }
 
@@ -355,9 +354,9 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     public void onServiceDisconnected(ComponentName componentName) {
         musicService = null;
     }
-
-    @Override
-    public void onCompletion(MediaPlayer mediaPlayer) {
-        doNext();
-    }
 }
+
+/**
+ *
+ * them bien de dieu khien chuyen tab ko tu dong phat nhac
+ */

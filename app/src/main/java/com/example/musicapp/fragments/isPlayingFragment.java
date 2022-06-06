@@ -1,6 +1,7 @@
 package com.example.musicapp.fragments;
 
 import static android.content.Context.BIND_AUTO_CREATE;
+import static com.example.musicapp.ApplicationClass.ACTION_CLEAR;
 import static com.example.musicapp.ApplicationClass.ACTION_NEXT;
 import static com.example.musicapp.ApplicationClass.ACTION_PLAY_PAUSE;
 import static com.example.musicapp.ApplicationClass.ACTION_PREVIOUS;
@@ -399,6 +400,10 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
             case ACTION_PREVIOUS:
                 showInfoSong();
                 break;
+
+            case ACTION_CLEAR:
+                setStatusClear();
+                break;
         }
     }
 
@@ -450,6 +455,15 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         } else {
             playPauseButton.setImageResource(R.drawable.ic_play_2);
         }
+    }
+
+    private void setStatusClear() {
+        Intent intent = new Intent(this.getContext(), MusicService.class);
+        getActivity().stopService(intent);
+        musicService.pause();
+
+        getActivity().moveTaskToBack(true);
+        getActivity().finish();
     }
 }
 

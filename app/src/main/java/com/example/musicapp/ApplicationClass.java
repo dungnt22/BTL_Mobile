@@ -13,6 +13,7 @@ public class ApplicationClass extends Application {
     public static final String ACTION_PREVIOUS = "actionprevious";
     public static final String ACTION_NEXT = "actionnext";
     public static final String ACTION_PLAY_PAUSE = "actionplaypause";
+    public static final String ACTION_CLEAR = "actionclear";
     public DBManager dbManager;
 
     @Override

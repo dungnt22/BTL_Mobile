@@ -1,5 +1,6 @@
 package com.example.musicapp.services;
 
+import static com.example.musicapp.ApplicationClass.ACTION_CLEAR;
 import static com.example.musicapp.ApplicationClass.ACTION_NEXT;
 import static com.example.musicapp.ApplicationClass.ACTION_PLAY_PAUSE;
 import static com.example.musicapp.ApplicationClass.ACTION_PREVIOUS;
@@ -77,6 +78,9 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                 case "Previous":
                     previous();
                     break;
+                case "Clear":
+                    clear();
+                    break;
             }
         }
         return START_STICKY;
@@ -152,6 +156,10 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                 .setAction(ACTION_PLAY_PAUSE);
         PendingIntent pausePending = PendingIntent.getBroadcast(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        Intent clearIntent = new Intent(this, NotificationReceiver.class)
+                .setAction(ACTION_CLEAR);
+        PendingIntent clearPending = PendingIntent.getBroadcast(this, 0, clearIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         Song song = nowPlaying.get(nowPosition);
         mSong = song;
         byte[] image = getImage(song.getPath());
@@ -170,6 +178,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                 .addAction(R.drawable.ic_previous, "Previous", prePending)
                 .addAction(playPauseBtn, "Pause", pausePending)
                 .addAction(R.drawable.ic_next, "Next", nextPending)
+                .addAction(R.drawable.ic_clear, "Clear", clearPending)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle())
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setOnlyAlertOnce(true)
@@ -220,6 +229,12 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         playMusic(nowPosition);
         showNotification(R.drawable.ic_pause);
         sendDataToIsPlayingFragment(ACTION_NEXT);
+    }
+
+    private void clear() {
+        stopSelf();
+        pause();
+        sendDataToIsPlayingFragment(ACTION_CLEAR);
     }
 
     private void sendDataToIsPlayingFragment(String action) {

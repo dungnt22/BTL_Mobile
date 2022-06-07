@@ -1,5 +1,6 @@
 package com.example.musicapp.services;
 
+import static com.example.musicapp.ApplicationClass.ACTION_CLEAR;
 import static com.example.musicapp.ApplicationClass.ACTION_NEXT;
 import static com.example.musicapp.ApplicationClass.ACTION_PLAY_PAUSE;
 import static com.example.musicapp.ApplicationClass.ACTION_PREVIOUS;
@@ -18,6 +19,7 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
@@ -39,6 +41,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     private MediaPlayer mediaPlayer;
     ActionPlaying actionPlaying;
     private int position;
+    Song mSong;
 
     @Override
     public void onCreate() {
@@ -67,19 +70,16 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         if (actionName != null) {
             switch (actionName) {
                 case "PlayPause":
-                    if (actionPlaying != null) {
-                        actionPlaying.doPlayOrPause();
-                    }
+                    pausePlay();
                     break;
                 case "Next":
-                    if (actionPlaying != null) {
-                        actionPlaying.doNext();
-                    }
+                    next();
                     break;
                 case "Previous":
-                    if (actionPlaying != null) {
-                        actionPlaying.doPre();
-                    }
+                    previous();
+                    break;
+                case "Clear":
+                    clear();
                     break;
             }
         }
@@ -156,7 +156,12 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                 .setAction(ACTION_PLAY_PAUSE);
         PendingIntent pausePending = PendingIntent.getBroadcast(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        Intent clearIntent = new Intent(this, NotificationReceiver.class)
+                .setAction(ACTION_CLEAR);
+        PendingIntent clearPending = PendingIntent.getBroadcast(this, 0, clearIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         Song song = nowPlaying.get(nowPosition);
+        mSong = song;
         byte[] image = getImage(song.getPath());
         Bitmap thumb = null;
         if (image != null) {
@@ -173,6 +178,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                 .addAction(R.drawable.ic_previous, "Previous", prePending)
                 .addAction(playPauseBtn, "Pause", pausePending)
                 .addAction(R.drawable.ic_next, "Next", nextPending)
+                .addAction(R.drawable.ic_clear, "Clear", clearPending)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle())
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setOnlyAlertOnce(true)
@@ -188,6 +194,58 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         byte[] image = retriever.getEmbeddedPicture();
         retriever.release();
         return image;
+    }
+
+    private void pausePlay() {
+        if (mediaPlayer != null) {
+            if (isPlaying()) {
+                showNotification(R.drawable.ic_play_2);
+                mediaPlayer.pause();
+            } else {
+                showNotification(R.drawable.ic_pause);
+                mediaPlayer.start();
+            }
+            sendDataToIsPlayingFragment(ACTION_PLAY_PAUSE);
+        }
+    }
+
+    private void previous() {
+        if (nowPosition > 0) {
+            nowPosition -= 1;
+        } else {
+            nowPosition = nowPlaying.size()-1;
+        }
+        playMusic(nowPosition);
+        showNotification(R.drawable.ic_pause);
+        sendDataToIsPlayingFragment(ACTION_PREVIOUS);
+    }
+
+    private void next() {
+        if (nowPosition < (nowPlaying.size()-1)) {
+            nowPosition += 1;
+        } else {
+            nowPosition = 0;
+        }
+        playMusic(nowPosition);
+        showNotification(R.drawable.ic_pause);
+        sendDataToIsPlayingFragment(ACTION_NEXT);
+    }
+
+    private void clear() {
+        stopSelf();
+        pause();
+        sendDataToIsPlayingFragment(ACTION_CLEAR);
+    }
+
+    private void sendDataToIsPlayingFragment(String action) {
+        Intent intent = new Intent("send_data_to_fragment");
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("oj_song", mSong);
+        bundle.putBoolean("status_player", isPlaying());
+        bundle.putString("action_music", action);
+        intent.putExtras(bundle);
+
+        sendBroadcast(intent);
     }
 
 }

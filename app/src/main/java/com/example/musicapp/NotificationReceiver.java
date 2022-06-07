@@ -1,5 +1,6 @@
 package com.example.musicapp;
 
+import static com.example.musicapp.ApplicationClass.ACTION_CLEAR;
 import static com.example.musicapp.ApplicationClass.ACTION_NEXT;
 import static com.example.musicapp.ApplicationClass.ACTION_PLAY_PAUSE;
 import static com.example.musicapp.ApplicationClass.ACTION_PREVIOUS;
@@ -27,6 +28,10 @@ public class NotificationReceiver extends BroadcastReceiver {
                     break;
                 case ACTION_PREVIOUS:
                     serviceIntent.putExtra("ActionName", "Previous");
+                    context.startService(serviceIntent);
+                    break;
+                case ACTION_CLEAR:
+                    serviceIntent.putExtra("ActionName", "Clear");
                     context.startService(serviceIntent);
                     break;
             }

@@ -23,12 +23,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/theme1"
-            android:text="@string/theme1"
-            android:checked="true"/>
+            android:hint="@string/theme1"/>
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/theme2"
-            android:text="@string/theme2" />
+            android:hint="@string/theme2" />
     </RadioGroup>
 </FrameLayout>

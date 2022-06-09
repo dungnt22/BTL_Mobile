@@ -20,12 +20,12 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -41,7 +41,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener, SettingsFragment.OnDataPass {
     private static final int REQUEST_CODE = 1;
 
     private static final int FRAGMENT_IS_PLAYING = 0;
@@ -57,9 +57,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static NavigationView navigationView;
     public static ApplicationClass appMusic;
 
+    public static final String LIGHT_DARK = "lightDark";
+    public static final String key = "dark";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getDarkOrLightMode();
+
         setContentView(R.layout.activity_main);
         permission();
 
@@ -257,5 +264,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         allSongFragment.songAdapter.updateList(searchSong);
         return true;
+    }
+
+    private void getDarkOrLightMode() {
+        SharedPreferences sharedPref = getSharedPreferences(LIGHT_DARK, Context.MODE_PRIVATE);
+        boolean darkMode = sharedPref.getBoolean(key, false);
+
+        if (darkMode) {
+            setTheme(R.style.Theme_ThemeDark);
+        } else {
+            setTheme(R.style.Theme_MusicApp);
+        }
+    }
+
+    @Override
+    public void onDataPass(boolean data) {
+        SharedPreferences.Editor editor = getSharedPreferences(LIGHT_DARK, Context.MODE_PRIVATE).edit();
+        editor.putBoolean(key, data);
+        editor.apply();
+        recreate();
     }
 }

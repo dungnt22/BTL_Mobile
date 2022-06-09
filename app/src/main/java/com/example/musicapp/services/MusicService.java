@@ -5,25 +5,23 @@ import static com.example.musicapp.ApplicationClass.ACTION_NEXT;
 import static com.example.musicapp.ApplicationClass.ACTION_PLAY_PAUSE;
 import static com.example.musicapp.ApplicationClass.ACTION_PREVIOUS;
 import static com.example.musicapp.ApplicationClass.CHANNEL_ID_2;
+import static com.example.musicapp.Base.getImage;
 import static com.example.musicapp.Base.nowPlaying;
 import static com.example.musicapp.Base.nowPosition;
+import static com.example.musicapp.Base.repeat;
+import static com.example.musicapp.Base.shuffle;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -34,7 +32,7 @@ import com.example.musicapp.R;
 import com.example.musicapp.fragments.isPlayingFragment;
 import com.example.musicapp.models.Song;
 
-import java.util.ArrayList;
+import java.util.Random;
 
 public class MusicService extends Service implements MediaPlayer.OnCompletionListener {
     IBinder myBinder = new MyBinder();
@@ -74,9 +72,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                     break;
                 case "Next":
                     next();
+                    onCompleted();
                     break;
                 case "Previous":
                     previous();
+                    onCompleted();
                     break;
                 case "Clear":
                     clear();
@@ -125,11 +125,18 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         return mediaPlayer.isPlaying();
     }
 
+    public void stop() {
+        mediaPlayer.stop();
+    }
+
+    public void release() {
+        mediaPlayer.release();
+    }
+
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
-        if (actionPlaying != null) {
-            actionPlaying.doNext();
-        }
+        next();
+        onCompleted();
     }
 
     public void onCompleted() {
@@ -188,14 +195,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         startForeground(2, notification);
     }
 
-    private byte[] getImage(String uri) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(uri);
-        byte[] image = retriever.getEmbeddedPicture();
-        retriever.release();
-        return image;
-    }
-
     private void pausePlay() {
         if (mediaPlayer != null) {
             if (isPlaying()) {
@@ -210,10 +209,12 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     private void previous() {
-        if (nowPosition > 0) {
-            nowPosition -= 1;
-        } else {
-            nowPosition = nowPlaying.size()-1;
+        if (shuffle) {
+            nowPosition = getRandomIndex(nowPlaying.size() - 1);
+        } else if (nowPosition > 0) {
+            nowPosition = nowPosition - 1;
+        } else if (nowPosition == 0){
+            nowPosition = nowPlaying.size() - 1;
         }
         playMusic(nowPosition);
         showNotification(R.drawable.ic_pause);
@@ -221,10 +222,12 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     private void next() {
-        if (nowPosition < (nowPlaying.size()-1)) {
-            nowPosition += 1;
-        } else {
-            nowPosition = 0;
+        if (shuffle) {
+            nowPosition = getRandomIndex(nowPlaying.size() - 1);
+        } else if (repeat) {
+            nowPosition = ((nowPosition + 1) % nowPlaying.size());
+        } else if (nowPosition < (nowPlaying.size() - 1)) {
+            nowPosition = nowPosition + 1;
         }
         playMusic(nowPosition);
         showNotification(R.drawable.ic_pause);
@@ -246,6 +249,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         intent.putExtras(bundle);
 
         sendBroadcast(intent);
+    }
+
+    private int getRandomIndex(int i) {
+        Random random = new Random();
+        return random.nextInt(i + 1);
     }
 
 }

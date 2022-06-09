@@ -5,6 +5,7 @@ import static com.example.musicapp.Base.artists;
 import static com.example.musicapp.Base.favoritePlaylist;
 import static com.example.musicapp.Base.nowPlaying;
 import static com.example.musicapp.Base.nowPosition;
+import static com.example.musicapp.Base.sortSong;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -41,7 +42,8 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener, SettingsFragment.OnDataPass {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SettingsFragment.OnDataPass {
+
     private static final int REQUEST_CODE = 1;
 
     private static final int FRAGMENT_IS_PLAYING = 0;
@@ -69,10 +71,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setContentView(R.layout.activity_main);
         permission();
+        sortSong(allOfSong);
 
         appMusic = (ApplicationClass) getApplication();
         appMusic.dbManager.open();
         favoritePlaylist = appMusic.dbManager.getAll();
+        sortSong(favoritePlaylist);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -163,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fragmentTransaction.commit();
     }
 
-
     /**
      * Click Back on device => close nav if it is opening
      */
@@ -237,33 +240,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             cursor.close();
         }
         return output;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.search, menu);
-        MenuItem menuItem = menu.findItem(R.id.menu_search);
-        SearchView searchView = (SearchView) menuItem.getActionView();
-        searchView.setOnQueryTextListener(this);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        String userInput = newText.toLowerCase();
-        ArrayList<Song> searchSong = new ArrayList<>();
-        for (Song song : allOfSong) {
-            if (song.getTitle().toLowerCase().contains(userInput)) {
-                searchSong.add(song);
-            }
-        }
-        allSongFragment.songAdapter.updateList(searchSong);
-        return true;
     }
 
     private void getDarkOrLightMode() {

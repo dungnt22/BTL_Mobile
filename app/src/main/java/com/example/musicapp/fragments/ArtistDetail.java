@@ -1,5 +1,6 @@
 package com.example.musicapp.fragments;
 
+import static com.example.musicapp.Base.getImage;
 import static com.example.musicapp.Base.nowPlaying;
 import static com.example.musicapp.MainActivity.allOfSong;
 import static com.example.musicapp.MainActivity.currentFragment;
@@ -110,13 +111,5 @@ public class ArtistDetail extends Fragment {
                 }
             }
         }
-    }
-
-    private byte[] getImage(String uri) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(uri);
-        byte[] image = retriever.getEmbeddedPicture();
-        retriever.release();
-        return image;
     }
 }

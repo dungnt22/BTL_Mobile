@@ -1,5 +1,7 @@
 package com.example.musicapp.adapters;
 
+import static com.example.musicapp.Base.getImage;
+
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
@@ -76,13 +78,5 @@ public class ArtistDetailAdapter extends RecyclerView.Adapter<ArtistDetailAdapte
             imageView = itemView.findViewById(R.id.song_item_img);
             textView = itemView.findViewById(R.id.song_item_title);
         }
-    }
-
-    private byte[] getImage(String uri) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(uri);
-        byte[] image = retriever.getEmbeddedPicture();
-        retriever.release();
-        return image;
     }
 }

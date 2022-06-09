@@ -6,10 +6,12 @@ import static com.example.musicapp.ApplicationClass.ACTION_NEXT;
 import static com.example.musicapp.ApplicationClass.ACTION_PLAY_PAUSE;
 import static com.example.musicapp.ApplicationClass.ACTION_PREVIOUS;
 import static com.example.musicapp.Base.favoritePlaylist;
+import static com.example.musicapp.Base.getImage;
 import static com.example.musicapp.Base.nowPlaying;
 import static com.example.musicapp.Base.nowPosition;
 import static com.example.musicapp.Base.repeat;
 import static com.example.musicapp.Base.shuffle;
+import static com.example.musicapp.Base.sortSong;
 import static com.example.musicapp.MainActivity.appMusic;
 
 import android.content.BroadcastReceiver;
@@ -87,7 +89,8 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         View view = inflater.inflate(R.layout.fragment_is_playing, container, false);
         init(view);
         getSongFromBundle();
-        setView();
+        setView(song);
+        playLocalMedia();
 
         requireActivity().registerReceiver(broadcastReceiver, new IntentFilter("send_data_to_fragment"));
 
@@ -126,20 +129,6 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
             @Override
             public void onClick(View view) {
                 doPlayOrPause();
-            }
-        });
-
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                doNext();
-            }
-        });
-
-        preButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                doPre();
             }
         });
 
@@ -198,14 +187,19 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         }
     }
 
-    private void setView() {
-
+    private void setView(Song song) {
+        boolean fav = false;
         titleSong.setText(song.getTitle());
         artist.setText(song.getArtist());
         timeTotal.setText(convertTime(Integer.parseInt(song.getDuration()) / 1000));
-        if (favoritePlaylist.contains(song)) {
-            favButton.setImageResource(R.drawable.ic_favorite_full);
-        } else {
+        for (int i = 0; i < favoritePlaylist.size(); i++) {
+            if (song.getTitle().equals(favoritePlaylist.get(i).getTitle())) {
+                favButton.setImageResource(R.drawable.ic_favorite_full);
+                fav = true;
+                break;
+            }
+        }
+        if (!fav) {
             favButton.setImageResource(R.drawable.ic_favorite);
         }
 
@@ -235,15 +229,6 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
                         .into(imgAlbum);
             }
         }
-        playLocalMedia();
-    }
-
-    private byte[] getImage(String uri) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(uri);
-        byte[] image = retriever.getEmbeddedPicture();
-        retriever.release();
-        return image;
     }
 
     private void playLocalMedia() {
@@ -268,6 +253,8 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
 
     @Override
     public void onResume() {
+        nextThreadBtn();
+        preThreadBtn();
         Intent intent = new Intent(this.getActivity(), MusicService.class);
         getActivity().bindService(intent, this, BIND_AUTO_CREATE);
         super.onResume();
@@ -277,6 +264,38 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     public void onPause() {
         getActivity().unbindService(this);
         super.onPause();
+    }
+
+    private void nextThreadBtn() {
+        Thread nextThread = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                nextButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        doNext();
+                    }
+                });
+            }
+        };
+        nextThread.start();
+    }
+
+    private void preThreadBtn() {
+        Thread preThread = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                preButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        doPre();
+                    }
+                });
+            }
+        };
+        preThread.start();
     }
 
     public void doPlayOrPause() {
@@ -292,37 +311,69 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     }
 
     public void doNext() {
+        musicService.stop();
+        musicService.release();
         if (shuffle) {
             nowPosition = getRandomIndex(nowPlaying.size() - 1);
             song = nowPlaying.get(nowPosition);
-            setView();
         } else if (repeat) {
             nowPosition = ((nowPosition + 1) % nowPlaying.size());
             song = nowPlaying.get(nowPosition);
-            setView();
         } else if (nowPosition < (nowPlaying.size() - 1)) {
             nowPosition = nowPosition + 1;
             song = nowPlaying.get(nowPosition);
-            setView();
-        } else {
-            Toast.makeText(this.getContext(), "Bạn đang ở cuối danh sách nhạc!", Toast.LENGTH_SHORT).show();
         }
+        musicService.createMusic(nowPosition);
+        setView(song);
+        seekBar.setMax(musicService.getDuration() / 1000);
+        this.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (musicService != null) {
+                    int currentPosition = musicService.getCurrentPosition() / 1000;
+                    seekBar.setProgress(currentPosition);
+                    timePlayed.setText(convertTime(currentPosition));
+                }
+                handler.postDelayed(this, 1000);
+            }
+        });
+        musicService.onCompleted();
+        musicService.showNotification(R.drawable.ic_pause);
+        playPauseButton.setImageResource(R.drawable.ic_pause);
+        musicService.start();
     }
 
     public void doPre() {
+        musicService.stop();
+        musicService.release();
         if (shuffle) {
             nowPosition = getRandomIndex(nowPlaying.size() - 1);
             song = nowPlaying.get(nowPosition);
-            setView();
         } else if (nowPosition > 0) {
             nowPosition = nowPosition - 1;
             song = nowPlaying.get(nowPosition);
-            setView();
         } else if (nowPosition == 0){
             nowPosition = nowPlaying.size() - 1;
             song = nowPlaying.get(nowPosition);
-            setView();
         }
+        musicService.createMusic(nowPosition);
+        setView(song);
+        seekBar.setMax(musicService.getDuration() / 1000);
+        this.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (musicService != null) {
+                    int currentPosition = musicService.getCurrentPosition() / 1000;
+                    seekBar.setProgress(currentPosition);
+                    timePlayed.setText(convertTime(currentPosition));
+                }
+                handler.postDelayed(this, 1000);
+            }
+        });
+        musicService.onCompleted();
+        musicService.showNotification(R.drawable.ic_pause);
+        playPauseButton.setImageResource(R.drawable.ic_pause);
+        musicService.start();
     }
 
     private void doRepeat() {
@@ -346,14 +397,22 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     }
 
     private void doFavourite() {
-        if (favoritePlaylist.contains(song)) {
-            favButton.setImageResource(R.drawable.ic_favorite);
-            favoritePlaylist.remove(song);
-            appMusic.dbManager.deleteFav(song.getTitle());
-        } else {
+        boolean fav = false;
+        for (int i = 0; i < favoritePlaylist.size(); i++) {
+            if (song.getTitle().equals(favoritePlaylist.get(i).getTitle())) {
+                favButton.setImageResource(R.drawable.ic_favorite);
+                favoritePlaylist.remove(song);
+                appMusic.dbManager.deleteFav(song.getTitle());
+                fav = true;
+                break;
+            }
+        }
+
+        if (!fav) {
             favButton.setImageResource(R.drawable.ic_favorite_full);
             favoritePlaylist.add(song);
             appMusic.dbManager.add(song);
+            sortSong(favoritePlaylist);
         }
     }
 
@@ -411,42 +470,9 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         if (mSong == null) {
             return;
         }
-
-        titleSong.setText(mSong.getTitle());
-        artist.setText(mSong.getArtist());
-        timeTotal.setText(convertTime(Integer.parseInt(mSong.getDuration()) / 1000));
-        if (favoritePlaylist.contains(mSong)) {
-            favButton.setImageResource(R.drawable.ic_favorite_full);
-        } else {
-            favButton.setImageResource(R.drawable.ic_favorite);
-        }
-
-        if (shuffle) {
-            shuffleButton.setImageResource(R.drawable.ic_shuffle_on);
-        } else {
-            shuffleButton.setImageResource(R.drawable.ic_shuffle_off);
-        }
-
-        if (repeat) {
-            repeatButton.setImageResource(R.drawable.ic_repeat_on);
-        } else {
-            repeatButton.setImageResource(R.drawable.ic_repeat_off);
-        }
-
-        byte[] image = getImage(mSong.getPath());
-        if (image != null) {
-            if (this.getContext() != null) {
-                Glide.with(this.getContext()).asBitmap()
-                        .load(image)
-                        .into(imgAlbum);
-            }
-        } else {
-            if (this.getContext() != null) {
-                Glide.with(this.getContext())
-                        .load(R.drawable.ic_music_record)
-                        .into(imgAlbum);
-            }
-        }
+        setView(mSong);
+        playPauseButton.setImageResource(R.drawable.ic_pause);
+        seekBar.setMax(musicService.getDuration() / 1000);
     }
 
     private void setStatusPlayOrPause() {
@@ -470,4 +496,5 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
 /**
  *
  * them bien de dieu khien chuyen tab ko tu dong phat nhac
+ * tao thread
  */

@@ -449,7 +449,6 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     @Override
     public void onDestroy() {
         super.onDestroy();
-        requireActivity().unregisterReceiver(broadcastReceiver);
         musicService = null;
     }
 

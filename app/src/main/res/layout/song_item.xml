@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/song_item"
-    android:background="@color/song_item_color"
+    android:background="?attr/colorItem"
     android:layout_marginBottom="1dp">
 
     <ImageView
@@ -11,7 +11,7 @@
         android:layout_height="60dp"
         android:id="@+id/song_item_img"
         android:padding="5dp"
-        android:backgroundTint="@color/purple_500"
+        android:backgroundTint="?attr/colorItem"
         android:src="@drawable/ic_music_record"/>
 
     <TextView

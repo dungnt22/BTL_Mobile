@@ -9,6 +9,9 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="background_color">#FF7083F1</color>
-    <color name="background_color_dark">#292828</color>
-    <color name="song_item_color">#2A41C3</color>
+    <color name="background_color_dark">#3A3838</color>
+    <color name="song_item_color">#3146BA</color>
+    <color name="song_item_color_dark">#292828</color>
+    <color name="toolBar_Light">#2438A3</color>
+    <color name="toolBar_Dark">#222121</color>
 </resources>

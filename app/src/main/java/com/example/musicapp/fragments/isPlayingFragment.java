@@ -24,6 +24,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Handler;
 import android.os.IBinder;
@@ -77,6 +78,9 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     private SeekBar seekBar;
     private TextView playlist;
     private FloatingActionButton playPauseButton;
+
+    public static PlaylistFragment playlistFragment = new PlaylistFragment();
+
 
     private final Handler handler = new Handler();
     private Song song;
@@ -418,6 +422,7 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
 
     private void showPlaylist() {
         Toast.makeText(this.getActivity(), "Playlist", Toast.LENGTH_SHORT).show();
+        getActivity().getSupportFragmentManager().beginTransaction().add(R.id.content_frame, playlistFragment).commit();
     }
 
     private int getRandomIndex(int i) {
@@ -492,9 +497,3 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         getActivity().finish();
     }
 }
-
-/**
- *
- * them bien de dieu khien chuyen tab ko tu dong phat nhac
- * tao thread
- */

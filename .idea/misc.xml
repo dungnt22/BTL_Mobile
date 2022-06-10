@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_arrow_down.xml" value="0.2555" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_favorite_full.xml" value="0.2365" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2495" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_menu_account.xml" value="0.2505" />
@@ -13,6 +14,7 @@
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_menu_settings.xml" value="0.2505" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_next.xml" value="0.2505" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_pause.xml" value="0.2365" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_repeat_off.xml" value="0.2555" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_repeat_on.xml" value="0.2365" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_repeat_one.xml" value="0.2365" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/drawable/ic_shuffle_off.xml" value="0.2365" />
@@ -26,11 +28,13 @@
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_artist.xml" value="0.21603260869565216" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_artist_detail.xml" value="0.25" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_favourite.xml" value="0.25" />
-        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_is_playing.xml" value="0.264" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_is_playing.xml" value="0.1" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_playlist.xml" value="0.1" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_scrolling.xml" value="0.25" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/fragment_settings.xml" value="0.25" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/layout_header_nav.xml" value="0.20606884057971014" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/main.xml" value="0.25" />
-        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/song_item.xml" value="0.1" />
+        <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/layout/song_item.xml" value="0.264" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/menu/menu_items.xml" value="0.25" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/menu/search.xml" value="0.25" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2495" />

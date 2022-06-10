@@ -71,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         permission();
         sortSong(allOfSong);
 
+        deleteDataDuplicateAlbum(isDuplicateAlbum());
+        deleteDataDuplicateArtist(isDuplicateArtist());
+
         appMusic = (ApplicationClass) getApplication();
         appMusic.dbManager.open();
         favoritePlaylist = appMusic.dbManager.getAll();
@@ -257,5 +260,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         editor.apply();
         navigationView.getMenu().findItem(R.id.menu_allSong).setChecked(true);
         recreate();
+    }
+
+    private boolean isDuplicateAlbum() {
+        for (int i = 0; i < albums.size(); i++) {
+            for (int j = i + 1; j < albums.size(); j++) {
+                if (albums.get(i).getAlbum().trim().equalsIgnoreCase(albums.get(j).getAlbum().trim())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void deleteDataDuplicateAlbum(boolean isDuplicate) {
+        if (isDuplicate) {
+            for (int i = 0; i < albums.size(); i++) {
+                for (int j = i + 1; j < albums.size(); j++) {
+                    if (albums.get(i).getAlbum().trim().equalsIgnoreCase(albums.get(j).getAlbum().trim())) {
+                        albums.remove(i);
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isDuplicateArtist() {
+        for (int i = 0; i < artists.size(); i++) {
+            for (int j = i + 1; j < artists.size(); j++) {
+                if (artists.get(i).getArtist().trim().equalsIgnoreCase(artists.get(j).getArtist().trim())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void deleteDataDuplicateArtist(boolean isDuplicate) {
+        if (isDuplicate) {
+            for (int i = 0; i < artists.size(); i++) {
+                for (int j = i + 1; j < artists.size(); j++) {
+                    if (artists.get(i).getArtist().trim().equalsIgnoreCase(artists.get(j).getArtist().trim())) {
+                        artists.remove(i);
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.example.musicapp.fragments;
 
 import static com.example.musicapp.Base.albums;
-import static com.example.musicapp.MainActivity.allOfSong;
 
 import android.os.Bundle;
 
@@ -33,6 +32,8 @@ public class AlbumFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), 2));
 
+        deleteDataDuplicate(isDuplicate());
+
         albumAdapter = new AlbumAdapter(this.getContext(), albums, new AlbumAdapter.IClickAlbumItem() {
             @Override
             public void onClickAlbumItem(Song album) {
@@ -51,4 +52,29 @@ public class AlbumFragment extends Fragment {
 
         return view;
     }
+
+    private boolean isDuplicate() {
+        for (int i = 0; i < albums.size(); i++) {
+            for (int j = i + 1; j < albums.size(); j++) {
+                if (albums.get(i).getAlbum().trim().equalsIgnoreCase(albums.get(j).getAlbum().trim())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void deleteDataDuplicate(boolean isDuplicate) {
+        if (isDuplicate) {
+            for (int i = 0; i < albums.size(); i++) {
+                for (int j = i + 1; j < albums.size(); j++) {
+                    if (albums.get(i).getAlbum().trim().equalsIgnoreCase(albums.get(j).getAlbum().trim())) {
+                        albums.remove(i);
+                    }
+                }
+            }
+        }
+    }
+
 }

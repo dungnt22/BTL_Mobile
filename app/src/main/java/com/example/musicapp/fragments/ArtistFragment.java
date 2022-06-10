@@ -33,8 +33,6 @@ public class ArtistFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), 2));
 
-        deleteDataDuplicate(isDuplicate());
-
         artistAdapter = new ArtistAdapter(this.getContext(), artists, new ArtistAdapter.ArtistItemClick() {
             @Override
             public void onClickArtistItem(Song artist) {
@@ -53,29 +51,5 @@ public class ArtistFragment extends Fragment {
         recyclerView.setAdapter(artistAdapter);
 
         return view;
-    }
-
-    private boolean isDuplicate() {
-        for (int i = 0; i < artists.size(); i++) {
-            for (int j = i + 1; j < artists.size(); j++) {
-                if (artists.get(i).getArtist().trim().equalsIgnoreCase(artists.get(j).getArtist().trim())) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private void deleteDataDuplicate(boolean isDuplicate) {
-        if (isDuplicate) {
-            for (int i = 0; i < artists.size(); i++) {
-                for (int j = i + 1; j < artists.size(); j++) {
-                    if (artists.get(i).getArtist().trim().equalsIgnoreCase(artists.get(j).getArtist().trim())) {
-                        artists.remove(i);
-                    }
-                }
-            }
-        }
     }
 }

@@ -100,7 +100,3 @@ public class allSongFragment extends Fragment implements SearchView.OnQueryTextL
         songAdapter.updateList(searchSong);
         return true;    }
 }
-
-/**
- * viet ham chuyen fragment ngay trong allSongFragment
- */

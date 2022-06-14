@@ -20,7 +20,7 @@ public class SettingsFragment extends Fragment {
     RadioButton darkRadioButton;
 
     public interface OnDataPass {
-        public void onDataPass(boolean data);
+        void onDataPass(boolean data);
     }
 
     OnDataPass dataPasser;
@@ -29,7 +29,7 @@ public class SettingsFragment extends Fragment {
     public static final String key_dark = "darkFrag";
 
     public SettingsFragment() {
-        // Required empty public constructor
+
     }
 
     private RadioGroup.OnCheckedChangeListener onCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {

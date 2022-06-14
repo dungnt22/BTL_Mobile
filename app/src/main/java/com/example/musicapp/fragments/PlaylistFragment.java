@@ -24,7 +24,7 @@ public class PlaylistFragment extends Fragment {
     private SongAdapter songAdapter;
 
     public PlaylistFragment() {
-        // Required empty public constructor
+
     }
 
     @Override

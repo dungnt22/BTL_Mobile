@@ -20,11 +20,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,7 +32,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.ActionPlaying;
@@ -329,7 +326,7 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         }
         musicService.createMusic(nowPosition);
         setView(song);
-        seekBar.setMax(musicService.getDuration() / 1000);
+        seekBar.setMax(Integer.parseInt(song.getDuration()) / 1000);
         this.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -353,16 +350,16 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         if (shuffle) {
             nowPosition = getRandomIndex(nowPlaying.size() - 1);
             song = nowPlaying.get(nowPosition);
+        } else if (repeat && nowPosition == 0) {
+            nowPosition = nowPlaying.size() - 1;
+            song = nowPlaying.get(nowPosition);
         } else if (nowPosition > 0) {
             nowPosition = nowPosition - 1;
-            song = nowPlaying.get(nowPosition);
-        } else if (nowPosition == 0){
-            nowPosition = nowPlaying.size() - 1;
             song = nowPlaying.get(nowPosition);
         }
         musicService.createMusic(nowPosition);
         setView(song);
-        seekBar.setMax(musicService.getDuration() / 1000);
+        seekBar.setMax(Integer.parseInt(song.getDuration()) / 1000);
         this.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -421,7 +418,6 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
     }
 
     private void showPlaylist() {
-        Toast.makeText(this.getActivity(), "Playlist", Toast.LENGTH_SHORT).show();
         getActivity().getSupportFragmentManager().beginTransaction().add(R.id.content_frame, playlistFragment).commit();
     }
 
@@ -436,7 +432,7 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         musicService = myBinder.getService();
         musicService.setCallBack(this);
 
-        seekBar.setMax(musicService.getDuration() / 1000);
+        seekBar.setMax(Integer.parseInt(song.getDuration()) / 1000);
         musicService.onCompleted();
         musicService.showNotification(R.drawable.ic_pause);
     }
@@ -476,7 +472,7 @@ public class isPlayingFragment extends Fragment implements ActionPlaying, Servic
         }
         setView(mSong);
         playPauseButton.setImageResource(R.drawable.ic_pause);
-        seekBar.setMax(musicService.getDuration() / 1000);
+        seekBar.setMax(Integer.parseInt(mSong.getDuration()) / 1000);
     }
 
     private void setStatusPlayOrPause() {

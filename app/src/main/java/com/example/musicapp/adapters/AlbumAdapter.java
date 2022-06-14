@@ -3,7 +3,6 @@ package com.example.musicapp.adapters;
 import static com.example.musicapp.Base.getImage;
 
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

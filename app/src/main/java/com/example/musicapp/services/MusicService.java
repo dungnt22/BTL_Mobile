@@ -211,10 +211,10 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     private void previous() {
         if (shuffle) {
             nowPosition = getRandomIndex(nowPlaying.size() - 1);
+        } else if (repeat && nowPosition == 0) {
+            nowPosition = nowPlaying.size() - 1;
         } else if (nowPosition > 0) {
             nowPosition = nowPosition - 1;
-        } else if (nowPosition == 0){
-            nowPosition = nowPlaying.size() - 1;
         }
         playMusic(nowPosition);
         showNotification(R.drawable.ic_pause);

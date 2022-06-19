@@ -221,7 +221,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
                 allOfSong = getAllSong(this);
+                sortSong(allOfSong);
                 nowPlaying = allOfSong;
+                goToIsPlayingFragment(nowPlaying.get(nowPosition));
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
             }

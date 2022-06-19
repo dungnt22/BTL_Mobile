@@ -22,7 +22,7 @@ public class ArtistFragment extends Fragment {
     ArtistAdapter artistAdapter;
 
     public ArtistFragment() {
-        // Required empty public constructor
+
     }
 
     @Override

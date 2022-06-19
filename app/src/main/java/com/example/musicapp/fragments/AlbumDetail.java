@@ -6,7 +6,6 @@ import static com.example.musicapp.MainActivity.allOfSong;
 import static com.example.musicapp.MainActivity.currentFragment;
 import static com.example.musicapp.MainActivity.navigationView;
 
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;

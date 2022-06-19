@@ -38,6 +38,23 @@
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/menu/menu_items.xml" value="0.25" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/menu/search.xml" value="0.25" />
         <entry key="..\:/II_2122/MOBILE/MusicApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2495" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/activity_main.xml" value="0.18" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/album_item.xml" value="0.19429347826086957" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_album.xml" value="0.25" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_album_detail.xml" value="0.25" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_all_song.xml" value="0.19429347826086957" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_artist.xml" value="0.19429347826086957" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_artist_detail.xml" value="0.19429347826086957" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_favourite.xml" value="0.19429347826086957" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_is_playing.xml" value="0.19429347826086957" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_playlist.xml" value="0.19429347826086957" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_settings.xml" value="0.25" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/image_item.xml" value="0.18795289855072464" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/layout_header_nav.xml" value="0.19429347826086957" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/layout/song_item.xml" value="0.19429347826086957" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/menu/menu_items.xml" value="0.19947916666666668" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/menu/search.xml" value="0.19947916666666668" />
+        <entry key="..\:/Users/Admin/Desktop/BTL_Mobile/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1795" />
         <entry key="..\:/Users/Trang/Desktop/BTL_Mobile/app/src/main/res/layout/activity_main.xml" value="0.203125" />
         <entry key="..\:/Users/Trang/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_album.xml" value="0.14629629629629629" />
         <entry key="..\:/Users/Trang/Desktop/BTL_Mobile/app/src/main/res/layout/fragment_album_detail.xml" value="0.14629629629629629" />

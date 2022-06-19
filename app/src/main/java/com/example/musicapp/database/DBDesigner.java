@@ -25,12 +25,24 @@ public class DBDesigner extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String create_fav_table = String.format("CREATE TABLE %s(%s TEXT, %s TEXT, %s TEXT, %s TEXT, %s TEXT)", TABLE_NAME, TITLE, ARTIST, ALBUM, DURATION, PATH);
         sqLiteDatabase.execSQL(create_fav_table);
+
+        createAccountOnFirst(sqLiteDatabase);
+    }
+
+    public void createAccountOnFirst(SQLiteDatabase sqLiteDatabase) {
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS account (" +
+                "                id integer primary key, " +
+                "                username varchar(150) not null," +
+                "                avatar text)");
+        sqLiteDatabase.execSQL("INSERT INTO account(id, username) VALUES (0, 'eren')");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         String drop_fav_table = String.format("DROP TABLE IF EXISTS %s", TABLE_NAME);
         sqLiteDatabase.execSQL(drop_fav_table);
+        String drop_account_table = String.format("DROP TABLE IF EXISTS account");
+        sqLiteDatabase.execSQL(drop_account_table);
         onCreate(sqLiteDatabase);
     }
 }

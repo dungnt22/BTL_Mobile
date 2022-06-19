@@ -30,4 +30,64 @@
             android:id="@+id/theme2"
             android:hint="@string/theme2" />
     </RadioGroup>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="140dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="Tên" />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/username"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="130dp"
+        android:layout_marginEnd="140dp"
+        android:textSize="20sp" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/changeUsername"
+        android:layout_marginTop="135dp"
+        android:layout_marginStart="300dp"
+        android:text="Thay đổi"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="230dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="Avatar"/>
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="140dp"
+        android:layout_marginTop="200dp"
+        android:id="@+id/avatar"
+        android:src="@drawable/avatar" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/changeAvatar"
+        android:layout_marginTop="230dp"
+        android:layout_marginStart="300dp"
+        android:text="Thay đổi" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/loadImageFromDevice"
+        android:layout_marginTop="320dp"
+        android:layout_marginStart="100dp"
+        android:text="Chọn ảnh từ thiết bị" />
+    <GridView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="320dp"
+        android:numColumns="3"
+        android:id="@+id/gridImage"/>
 </FrameLayout>

@@ -23,10 +23,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.musicapp.fragments.AlbumFragment;
@@ -35,6 +39,7 @@ import com.example.musicapp.fragments.FavouriteFragment;
 import com.example.musicapp.fragments.SettingsFragment;
 import com.example.musicapp.fragments.allSongFragment;
 import com.example.musicapp.fragments.isPlayingFragment;
+import com.example.musicapp.models.Account;
 import com.example.musicapp.models.Song;
 import com.google.android.material.navigation.NavigationView;
 
@@ -56,10 +61,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static ArrayList<Song> allOfSong = new ArrayList<>();
     public static NavigationView navigationView;
     public static ApplicationClass appMusic;
+    public static Account account;
+    public static View header;
 
     public static final String LIGHT_DARK = "lightDark";
     public static final String key = "dark";
 
+    public static TextView usernameStatic;
+    public static ImageView avatarStatic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,10 +99,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
+        header = navigationView.getHeaderView(0);
+        usernameStatic = header.findViewById(R.id.usernameOfAccount);
+        avatarStatic = header.findViewById(R.id.avatarOfAccount);
+        loadAccount();
 
         changeFragment(new allSongFragment());
         navigationView.getMenu().findItem(R.id.menu_allSong).setChecked(true);
         currentFragment = FRAGMENT_ALL_SONG;
+    }
+
+    public static void loadAccount() {
+        account = appMusic.dbManager.getAccount();
+        usernameStatic.setText(account.getUsername());
+        if (account.getAvatar() == null) {
+            avatarStatic.setImageResource(R.drawable.avatar);
+        } else {
+            avatarStatic.setImageBitmap(BitmapFactory.decodeFile(account.getAvatar()));
+        }
     }
 
     @Override

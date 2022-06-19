@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.musicapp.models.Account;
 import com.example.musicapp.models.Song;
 
 import java.util.ArrayList;
@@ -54,6 +55,27 @@ public class DBManager {
         }
         cursor.close();
         return favMusic;
+    }
+
+    public Account getAccount() {
+        Cursor cursor = database.rawQuery("SELECT * FROM account WHERE id = 0", null);
+        cursor.moveToFirst();
+        Account account = new Account(cursor.getInt(0), cursor.getString(1), //id, username
+                cursor.getString(2));                  // avatar
+        cursor.close();
+        return account;
+    }
+
+    public void changeUsernameAccount(String usernameAccount) {
+        database.execSQL("UPDATE account " +
+                "SET username = '" + usernameAccount + "' " +
+                "WHERE id = 0");
+    }
+
+    public void changeAvatarAccount(String avatarAccount) {
+        database.execSQL("UPDATE account " +
+                "SET avatar = '" + avatarAccount + "' " +
+                "WHERE id = 0");
     }
 
     private Song toSong(Cursor cursor) {
